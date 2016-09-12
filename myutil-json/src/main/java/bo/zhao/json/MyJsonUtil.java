@@ -28,9 +28,18 @@ public class MyJsonUtil {
         }
         Iterator<JsonNode> elements = jsonNode.elements();
         while (elements.hasNext()) {
-            String result = findNode(jsonNode.toString(), filedName);
-            if (result != null) {
-                return result;
+            JsonNode tempNode = elements.next();
+            if (tempNode.isObject()) {
+                JsonNode node = objectMapper.readTree(tempNode.toString());
+                if (node.has(filedName)) {
+                    return node.get(filedName).toString();
+                }
+                else {
+                    String result = findNode(node.toString(),filedName);
+                    if (result != null) {
+                        return result;
+                    }
+                }
             }
         }
         return null;
