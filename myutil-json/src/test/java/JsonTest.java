@@ -30,7 +30,8 @@ public class JsonTest {
         person.setApple(apple);
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonStr = objectMapper.writeValueAsString(person);
-        System.out.println(MyJsonUtil.findNode(jsonStr,"color"));
+//        System.out.println(MyJsonUtil.findNode(jsonStr,"color"));
+        System.out.println(MyJsonUtil.asMap(jsonStr));
     }
 
     private class Person {
