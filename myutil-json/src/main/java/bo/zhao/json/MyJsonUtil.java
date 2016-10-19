@@ -1,11 +1,13 @@
 package bo.zhao.json;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import sun.org.mozilla.javascript.internal.json.JsonParser;
+import com.fasterxml.jackson.databind.introspect.MemberKey;
 
 import java.io.IOException;
+import java.nio.channels.Pipe;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,10 +25,6 @@ import java.util.Map;
 public class MyJsonUtil {
 
     public static final ObjectMapper mapper = new ObjectMapper();
-
-    public static void main(String[] args) {
-
-    }
 
 
     public static String findNode(String jsonStr, String filedName) throws IOException {
@@ -62,21 +60,14 @@ public class MyJsonUtil {
 
     public static Map<String,Object> asMap(JsonNode jsonNode) throws IOException {
         Map<String,Object> resultMap = new HashMap<String, Object>();
-        Iterator<JsonNode> elements = jsonNode.elements();
-        while (elements.hasNext()) {
-            JsonNode next = elements.next();
-            System.out.println(next);
-            if (next.isObject()) {
-                JsonNode node = mapper.readTree(next.toString());
-                resultMap.putAll(asMap(node));
-            } else if (next.isArray()) {
-                Iterator<JsonNode> arrElements = next.elements();
-                while (arrElements.hasNext()) {
-                    resultMap.putAll(asMap(arrElements.next()));
-                }
-            } else {
-                resultMap.put(next.asText(),next.asText());
+        Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> next = fields.next();
+            String value = next.getValue().asText();
+            if (next.getValue().isContainerNode()) {
+                value = mapper.writeValueAsString(next.getValue());
             }
+            resultMap.put(next.getKey(),value);
         }
         return resultMap;
     }
